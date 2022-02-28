@@ -1,0 +1,349 @@
+front-end
+
+#pastikan sudah terupdate nodejs dan npm nya
+
+# create react js
+buat folder front-end
+npx create-react-app ./
+
+# install package yg dibutuhkan (bulma untuk style)
+npm install react-router-dom axios bulma
+
+# install extension bulma & es7
+
+# ubah struktur src reactjs nya
+hapus dan tinggalkan app.js & index.js
+
+# app.js
+function App() {
+  return (
+    <div className="container">
+      <div class="columns">
+        <div class="column is-half is-offset-one-quarter">
+          <h2>Welcome</h2>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default App;
+
+
+# upload bulma di index.js
+import React from 'react';
+import ReactDOM from 'react-dom';
+import App from './App';
+import "bulma/css/bulma.css";
+
+ReactDOM.render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>,
+  document.getElementById('root')
+);
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+1. buat struktur folder
+#buat folder components yangberisi AddUser.js EditUser.js UserList.js
+
+a. UserList.js
+import { useState, useEffect } from 'react'
+import axios from "axios";
+import { Link } from 'react-router-dom';
+
+const UserList = () => {
+    const [user, setUser] =  useState([]);  <note : ini state berfungsi untuk mengambil user >
+
+    useEffect(() => {
+        getUser();
+    }, []); <note: memanggil fuction getUser didalam useEffect hook >
+
+    const getUser = async () => {
+        const response = await axios.get('http://localhost:4500/crud');
+	setUser(response.data);
+        console.log(response.data);
+    } <note : method untuk menfetching data dari API>    
+
+    return (
+        <div>
+            <Link to="/add" className='button is-primary mt-2'>Add New User</Link>
+            <table className="table is-striped is-fullwidth">
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Password</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {user.map((user, index) => (   <note: connect api value >
+                        <tr key={user.id}> (       <note: primarykey>
+                            <td>{ index + 1}</td>
+                            <td>{ user.username }</td>
+                            <td>{ user.email }</td>
+                            <td>*****</td>
+                            <td>
+                                <button className="button is-small is-info">Edit</button>
+                                <button className="button is-small is-danger">Delete</button>
+                            </td>
+                        </tr>
+                    ))}
+            </table>
+        </div>
+    )
+}
+
+export default UserList
+
+b. AddUser
+import React from 'react'
+import axios from "axios";
+
+const AddUser = () => {
+  return (
+    <div>
+            <form >
+                <div className="field">
+                    <label className="label">Username</label>
+                    <input className="input" type="text" placeholder="Username" />
+                </div>
+ 
+                <div className="field">
+                    <label className="label">Email</label>
+                    <input className="input" type="text" placeholder="Email" />
+                </div>
+
+                <div className="field">
+                    <label className="label">Password</label>
+                    <input className="input" type="password" placeholder="Password" />
+                </div>
+ 
+                <div className="field">
+                    <button className="button is-primary mt-2">Save</button>
+                </div>
+            </form>
+        </div>
+
+    <div>
+  )
+}
+
+export default AddUser
+
+b. connect ke api backend create untuk menambahkan user dan tambahkan beberapa function dan event
+
+import { useState } from 'react';
+import axios from "axios";
+import { useHistory } from 'react-router-dom';
+
+const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const history = useHistory();
+
+    const saveUser = async (e) => {
+        e.preventDefault();
+        await axios.post('http://localhost:4500/crud',{
+            username: username,
+            email: email,
+            password: password
+        });
+        history.push("/");
+    }
+
+return (
+        <div>
+            <form onSubmit={ saveUser }>
+                <div className="field">
+                    <label className="label">Username</label>
+                    <input 
+                        className="input"
+                        type="text"
+                        placeholder="Username"
+                        value={ username }
+                        onChange={ (e) => setUsername(e.target.value) }
+                    />
+                </div>
+ 
+                <div className="field">
+                    <label className="label">Email</label>
+                    <input 
+                        className="input"
+                        type="text"
+                        placeholder="Email"
+                        value={ email }
+                        onChange={ (e) => setEmail(e.target.value) }
+                    />
+                </div>
+
+                <div className="field">
+                    <label className="label">Password</label>
+                    <input 
+                        className="input"
+                        type="password"
+                        placeholder="Password"
+                        value={ password }
+                        onChange={ (e) => setPassword(e.target.value) }
+                    />
+                </div>
+ 
+                <div className="field">
+                    <button className="button is-primary mt-2">Save</button>
+                </div>
+            </form>
+        </div>
+    )
+
+c. EditUser.js copy semua code dari AddUser.js dan edit adduser menjadi EditUser
+
+import { useState } from 'react';
+import axios from "axios";
+import { useHistory } from 'react-router-dom';
+
+const EditUser = () => {
+    const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const history = useHistory();
+
+    const saveUser = async (e) => {
+        e.preventDefault();
+        await axios.post('http://localhost:4500/crud',{
+            username: username,
+            email: email,
+            password: password
+        });
+        history.push("/");
+    }
+
+    return (
+        <div>
+            <form onSubmit={ saveUser }>
+                <div className="field">
+                    <label className="label">Username</label>
+                    <input 
+                        className="input"
+                        type="text"
+                        placeholder="Username"
+                        value={ username }
+                        onChange={ (e) => setUsername(e.target.value) }
+                    />
+                </div>
+ 
+                <div className="field">
+                    <label className="label">Email</label>
+                    <input 
+                        className="input"
+                        type="text"
+                        placeholder="Email"
+                        value={ email }
+                        onChange={ (e) => setEmail(e.target.value) }
+                    />
+                </div>
+
+                <div className="field">
+                    <label className="label">Password</label>
+                    <input 
+                        className="input"
+                        type="password"
+                        placeholder="Password"
+                        value={ password }
+                        onChange={ (e) => setPassword(e.target.value) }
+                    />
+                </div>
+ 
+                <div className="field">
+                    <button className="button is-primary mt-2">Update</button>
+                </div>
+            </form>
+        </div>
+    )
+}
+
+export default EditUser
+
+c. tambahkan package useEffect dan useParams & buat function arrow useEffect
+
+import { useState, useEffect } from 'react';
+import { useHistory, useParams } from 'react-router-dom';
+
+const { id } = useParams();
+
+useEffect(() => {
+        getUserById();
+    }, []);
+
+c. buat function untuk memanggil user by id
+
+const getUserById = async () => {
+        const response = await axios.get(`http://localhost:4500/crud/${id}`);
+        setUsername(response.data.username);
+        setEmail(response.data.email);
+        setPassword(response.data.password);
+    }
+
+c. ubah function saveUser yg tadi post=create ke updateUser menjadi put=update note put dan patch juga bisa tergantung kalian set dibackend
+const updateUser = async (e) => {
+        e.preventDefault();
+        await axios.put(`http://localhost:4500/crud/${id}`,{
+            username: username,
+            email: email,
+            password: password
+        });
+        history.push("/");
+    }
+
+<form onSubmit={ updateUser }>
+
+c. edit button edit di UserList.js dengan Link
+
+<Link to={`/edit/${user.id}`} className="button is-small is-info">Edit</Link>
+
+d. membuat method deleteUser
+ const deleteUser = async (id) => {
+        const response = await axios.delete(`http://localhost:4500/crud/${id}`);
+        setUser(response.data);
+    }
+
+d. membuat function delete di UserList.js
+<button onClick={ () => deleteUser(user.id) } className="button is-small is-danger">Delete</button>
+
+
+2. buat routing bercabang di aap.js menggunakan { BrowserRouter as Router, Route, Switch } dari react-router-dom
+
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import UserList from "./components/UserList";
+import AddUser from "./components/AddUser";
+import EditUser from "./components/EditUser";
+
+function App() {
+  return (
+    <Router>
+      <div className="container">
+        <div className="columns">
+          <div className="column is-half is-offset-one-quarter">
+            <Switch>
+              <Route exact path="/">
+              <UserList />
+              </Route>
+              <Route path="/add">
+                <AddUser />
+              </Route>
+	      <Route path="/add">
+                <EditUser />
+              </Route>
+            </Switch>
+          </div>
+        </div>
+      </div>
+    </Router>
+  );
+}
+
+export default App;
+
+
